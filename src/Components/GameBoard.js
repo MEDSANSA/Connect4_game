@@ -4,7 +4,7 @@ import GameCircle from "./GameCircle";
 const GameBoard = () => {
     return (
         <div>
-            <GameCircle id={1}>
+            <GameCircle id={1} value={3}>
                 red
             </GameCircle>
             <GameCircle id={2}>
