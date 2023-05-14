@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../Game.css";
 import GameCircle from "./GameCircle";
-import Header from "./Header";
+import Header from "./header";
 import Footer from "./Footer";
 
 const no_Circles = 16;
