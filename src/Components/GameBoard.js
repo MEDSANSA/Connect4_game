@@ -1,17 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../Game.css";
 import GameCircle from "./GameCircle";
-import Header from "./header";
+import Header from "./Header";
 import Footer from "./Footer";
+import { isWinner, isDraw, getComputerMove} from "../helper";
+//importation des constantes
+import { Game_State_Playing, Game_State_Win, Game_State_Draw, no_Player, Player_1, Player_2, no_Circles } from "../constants";
 
-const no_Circles = 16;
-const no_Player = 0;
-const Player_1 = 1;
-const Player_2 = 2;
 
 const GameBoard = () => {
     const [gameBoard, setGameBoard] = useState(Array(16).fill(no_Player));
     const [currentPlayer, setCurrentPlayer] = useState(Player_1);
+    const [gameState, setGameState] = useState(Game_State_Playing);
+    const [winner, setWinner] = useState(no_Player);
+
+    useEffect(() => {
+        initGame();
+    }, []);
+
+    const initGame = () => {
+        console.log('init game');
+        setGameBoard(Array(16).fill(no_Player));
+        setCurrentPlayer(Player_1);
+        setGameState(Game_State_Playing);
+    }
 
     //render the 16 circles
     const initBoard = () => {
@@ -22,8 +34,27 @@ const GameBoard = () => {
         return circles;
     }
 
+    const suggestMove = () => {
+        circleClicked(getComputerMove(gameBoard));
+    }
+
     //callbacks  bunction
     const circleClicked = (id) => {
+
+        //check the selected circle not selected another time
+        if (gameBoard[id] !== no_Player) return;
+        //if some one wins the game is over
+        if (gameState !== Game_State_Playing) return;
+
+        if (isWinner(gameBoard, id, currentPlayer)) {
+            setGameState(Game_State_Win);
+            setWinner(currentPlayer);
+        }
+        if (isDraw(gameBoard, id, currentPlayer)) {
+            setGameState(Game_State_Draw);
+            setWinner(no_Player);
+        }
+
         setGameBoard(prev => {
             return prev.map((circle, pos) => {
                 if (pos === id) {
@@ -33,6 +64,7 @@ const GameBoard = () => {
                 }
             })
         });
+
         setCurrentPlayer(currentPlayer === Player_1 ? Player_2 : Player_1);
     };
 
@@ -43,11 +75,11 @@ const GameBoard = () => {
 
     return (
         <>
-            <Header />
+            <Header gameState={gameState} currentPlayer={currentPlayer} winner={winner} />
             <div className="gameBoard">
                 {initBoard()}
             </div>
-            <Footer />
+            <Footer onNewGameClick={initGame} onSuggestClick={suggestMove} />
         </>
     );
 }
